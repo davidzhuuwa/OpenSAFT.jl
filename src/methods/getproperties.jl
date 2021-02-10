@@ -351,6 +351,15 @@ function get_chemical_potential(model::EoS, p, T, z=[1.]; phase = "unknown")
     return ForwardDiff.gradient(fun,z)
 end
 
+function get_fugacity_coefficient(model::EoS, p, T, z=[1.]; phase = "unknown")
+    z = create_z(model,z)
+    v      = get_volume(model, p, T, z; phase=phase)
+    fun(x) = a_res(model,x,v,T)
+    Da_res = ForwardDiff.gradient(fun,z) 
+    Z = p*v/(N_A*k_B*T)
+    return Da_res/(N_A*k_B) - log(Z)
+end
+
 function get_internal_energy(model::EoS, p, T, z=[1.]; phase = "unknown")
     z = create_z(model, z)
     v      = get_volume(model, p, T, z; phase=phase)[1]
