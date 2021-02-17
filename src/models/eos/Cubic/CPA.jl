@@ -65,13 +65,17 @@ function X_assoc(model::CPAFamily, z, v, T)
         X_iA_old = deepcopy(X_iA)
         iter += 1
     end
-
+    println(X_iA)
     return X_iA
 end
 
 function Δ(model::CPAFamily, z, v, T, i, j, a, b)
     ϵ_assoc = model.params.epsilon_assoc[Set([(i,a),(j,b)])]*1e2/R̄
+#    println(i)
+#    println(j)
+#    println(ϵ_assoc)
     β = model.params.bond_vol[Set([(i,a),(j,b)])]*1e-3
+#    println(β) 
     x = z/sum(z[i] for i in model.components)
     b̄  = sum(sum(model.params.b[union(i,j)]*x[i]*x[j] for j in model.components) for i in model.components)
     η = b̄*sum(z[i] for i in model.components)/(4*v)

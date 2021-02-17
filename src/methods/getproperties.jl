@@ -351,6 +351,15 @@ function get_chemical_potential(model::EoS, p, T, z=[1.]; phase = "unknown")
     return ForwardDiff.gradient(fun,z)
 end
 
+function get_fugacity_coefficient(model::EoS, p, T, z=[1.]; phase = "unknown")
+    z = create_z(model,z)
+    v      = get_volume(model, p, T, z; phase=phase)
+    Z = (p*v)/(N_A*k_B*T)
+    #fun(x) = a_res(model,x,v,T)
+    #return ForwardDiff.gradient(fun,z) .-log(Z)
+    return a_res(model,z,v,T) .+ (Z-1) .- log(Z) #n.b. this is version for pure components
+end
+
 function get_internal_energy(model::EoS, p, T, z=[1.]; phase = "unknown")
     z = create_z(model, z)
     v      = get_volume(model, p, T, z; phase=phase)[1]
@@ -380,6 +389,12 @@ function get_Helmholtz_free_energy(model::EoS, p, T, z=[1.]; phase = "unknown")
     v      = get_volume(model, p, T, z; phase=phase)
     return eos(model, z, v, T)
 
+end
+
+function get_Helmholtz_residual_free_energy(model::EoS, p, T, z=[1.]; phase = "unknown")
+    z = create_z(model, z)
+    v       = get_volume(model, p, T, z; phase=phase)
+    return N_A*k_B*T*a_res(model, z, v, T)
 end
 
 function get_isochoric_heat_capacity(model::EoS, p, T, z=[1.]; phase = "unknown")
